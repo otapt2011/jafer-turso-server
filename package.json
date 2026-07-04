@@ -10,9 +10,7 @@
   "dependencies": {
     "jsonwebtoken": "^9.0.2"
   },
-  "devDependencies": {
-    "vercel": "^latest"
-  },
+  "devDependencies": {},
   "engines": {
     "node": ">=18"
   }
