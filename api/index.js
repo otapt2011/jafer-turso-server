@@ -44,26 +44,15 @@ function getRequestBody(req) {
     req.on('data', chunk => chunks.push(chunk));
     req.on('end', () => {
       let body = Buffer.concat(chunks);
-
-      // Safely handle gzip decompression
+      // Decompress if gzip
       if (req.headers['content-encoding'] === 'gzip') {
-        // Check for gzip magic bytes (1F 8B) before decompressing
-        if (body.length > 2 && body[0] === 0x1F && body[1] === 0x8B) {
-          try {
-            body = zlib.gunzipSync(body);
-          } catch (e) {
-            // If decompression fails, fall back to raw string
-            body = body.toString('utf-8');
-          }
-        } else {
-          // Headers said gzip but data wasn't, fall back to raw string
-          body = body.toString('utf-8');
+        try {
+          body = zlib.gunzipSync(body);
+        } catch (e) {
+          return reject(new Error('Failed to decompress request body'));
         }
-      } else {
-        body = body.toString('utf-8');
       }
-
-      resolve(body);
+      resolve(body.toString());
     });
     req.on('error', reject);
   });
